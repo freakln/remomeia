@@ -1,24 +1,33 @@
-import json
+import csv
 import os
 import re
 
-fileOfDirectory = os.listdir('.')
+folder = './entrada/'
+fileOfDirectory = os.listdir(folder)
 pattern = "*.json"
-pattern_regex = r"^www"
+pattern_regex = r"xml:lang"
 replacement = ''
 file_name = 'urls-para-troca.json'
-new_file_name = 'www.json'
+new_file_name = 'saida.csv'
 
-new_data = []
+new_data = [['Unnamed: 0','site_id','article_id','wordpress_id','article_url','tag','position_in_text']]
 
-with open(file_name, encoding='utf-8') as f:
-    data = json.load(f)
-    for i in data:
-        aux = re.search(pattern_regex, str(i['error_link']))
+print(fileOfDirectory)
 
-        if aux:
-            print(i['error_link'])
-            new_data.append(i)
+for file in fileOfDirectory:
+    with open(folder + file, newline='', encoding='utf-8') as csv_file:
+        spamreader = csv.reader(csv_file, delimiter=',', quotechar='|')
+        for row in spamreader:
+            aux = re.search(pattern_regex, (', '.join(row)))
+            if aux:
+                print(row)
+                new_data.append(row)
+    csv_file.close()
 
-    with open(new_file_name, 'w') as outfile:
-        json.dump(new_data, outfile)
+with open(new_file_name, 'w', newline='',  encoding='utf-8') as csv_file:
+    spamwriter = csv.writer(csv_file, delimiter=',',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    for row in new_data:
+        spamwriter.writerow(row)
+
+
